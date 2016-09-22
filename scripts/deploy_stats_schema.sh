@@ -44,6 +44,11 @@ cat ../data/synth_age_range_dim.csv | psql -d fhir -c "\COPY synth_ma.synth_age_
 cat ../data/synth_disease_dim.csv | psql -d fhir -c "\COPY synth_ma.synth_disease_dim (disease_id, disease_name) FROM STDIN (DELIMITER ',', QUOTE '\"', HEADER TRUE, FORMAT CSV)"
 cat ../data/synth_condition_dim.csv | psql -d fhir -c "\COPY synth_ma.synth_condition_dim (condition_id, disease_id, condition_name, code_system, code) FROM STDIN (DELIMITER ',', QUOTE '\"', HEADER TRUE, FORMAT CSV)"
 
+echo "Creating fact tables..."
+psql -d fhir -f ../sql/tables/synth_pop_facts.sql
+psql -d fhir -f ../sql/tables/synth_condition_facts.sql
+psql -d fhir -f ../sql/tables/synth_disease_facts.sql
+
 echo "Creating views..."
 psql -d fhir -f ../sql/views/synth_county_pop_stats.sql
 psql -d fhir -f ../sql/views/synth_cousub_pop_stats.sql
