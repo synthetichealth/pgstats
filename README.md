@@ -8,40 +8,56 @@ The current schema for the synthetic statistics is document as a UML diagram. Se
 
 Most data that are used by the Synthetic Mass UI are exposed as Postgres views. These views are typically less granular but provide more useful statistics than the underlying data.
 
-**Views:**
+Views
+-----
 
-* `synth_county_stats` - **total** population stats at the county level
-* `synth_cousub_stats` - **total** population stats at the subdivision level
-* `synth_county_facts` - **disease-specific** stats at the county level
-* `synth_cousub_facts` - **disease-specific** stats at the subdivision level
+* `synth_county_pop_stats` - **total** population stats at the county level
+* `synth_cousub_pop_stats` - **total** population stats at the subdivision level
+* `synth_county_condition_stats` - **condition-specific** stats at the county level
+* `synth_cousub_condition_stats` - **condition-specific** stats at the subdivision level
+* `synth_county_disease_stats` - **disease-specific** stats at the county level
+* `synth_cousub_disease_stats` - **disease-specific** stats at the subdivision level
 
 The tables underlying these views have higher granularity and are generally updated with the most recent stats. They are rarely queried directly and are exposed through the views mentioned above.
 
-**Tables:**
+We interpret **"conditions"** to mean a unique condition with a unique SNOMED code, for example "myocardial\_infarction".
+
+We interpret **"diseases"** to be high-level statistics that may include one or more conditions. For example, the disease "food\_allergy" may include the conditions "food\_allergy\_peanuts", "food\_allergy\_tree\_nuts", and "food\_allergy\_shellfish".
+
+For all county-level statistics we simply aggregate the subdivision statistics.
+
+Tables
+-----
 
 * `synth_county_dim` - immutable county data
 * `synth_cousub_dim` - immutable subdivision data
-* `synth_condition_dim` - conditions/facts we track
-* `synth_age_dim` - age ranges we track
-* `synth_facts` - **condition-specific** stats at the **subdivision** level
+* `synth_condition_dim` - conditions we track
+* `synth_disease_dim` - diseases we track
+* `synth_age_range_dim` - age ranges we track
+* `synth_pop_facts` - **total** population stats at the **subdivision** level
+* `synth_condition_facts` - **condition-specific** population stats at the **subdivision** level
+* `synth_disease_facts` - **disease-specific** population stats at the **subdivision** level
 
-Note: the "_dim" suffix means "dimension".
-
-For all county-level statistics we simply aggregate the subdivision statistics. Each "fact" we track (e.g. "cancer") may be made up of multiple conditions (e.g. "breast cancer", "lung cancer", and "colon cancer"). While we currently expose stats only at the fact granularity level, additional views can be added to expose stats at the condition or age-range granularity levels.
-
-For persons without any diseases we track a "none" condition that helps us aggregate total population counts (total people with _and_ without diseases) at the county and subidivision levels.
+Note: the "_dim" suffix means "dimension". These tables contain data that rarely changes.
 
 Resetting Statistics
 --------------------
-Run the script `resetstats.sh` as user `postgres`. This does the following:
+Run the script `resetfacts.sh` as user `postgres`. This does the following:
 
-1. Drops all rows in the `synth_facts` table.
+1. Drops all rows in the `synth_*_facts` tables in the `synth_ma` schema.
 
-This will cause all views to automatically update with zero-valued stats. We interpret null rows in the `synth_facts` table as "zero".
+This will cause all views to automatically update with zero-valued stats. We interpret null rows in the `synth_*_facts` tables as "zero".
+
+Updating Views
+--------------
+If the view logic changes (for example, to add additional computed statistics like rates) all views can be updated by running `resetviews.sh` as user `postgres`. This does the following:
+
+1. Drops (cascading) all `synth_*_*_stats` views in the `synth_ma` schema.
+2. Rebuilds the views using the updated SQL files. 
 
 Adding or Updating Statistics
 -----------------------------
-Facts should be added to this table using **"upserts"**. Each fact is uniquely identified by a composite key of `(cs_fips, condition_id, age_id)`. If an attempted insert into the `synth_facts` table violates this key an update of the existing row should be performed instead.
+Facts should be added to the facts tables using **"upserts"**. In each of the fact tables each fact is uniquely identified by a composite key. If an attempted insert into any of the `synth_*_facts` table violates these keys an update of the existing row should be performed instead.
 
 License
 -------
