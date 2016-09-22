@@ -1,5 +1,4 @@
 "condition_id","fact_name","condition_name","code_system","code"
-4,"none","none","",""
 5,"diabetes","diabetes","SNOMED-CT","44054006"
 6,"heart_disease","stroke","SNOMED-CT","230690007"
 7,"heart_disease","coronary_heart_disease","SNOMED-CT","53741008"
@@ -10,3 +9,4 @@
 12,"opioid_addiction","drug_rehabilitation","SNOMED-CT","56876005"
 13,"opioid_addiction","drug_addiction_therapy","SNOMED-CT","266707007"
 14,"opioid_addiction","drug_overdose","SNOMED-CT","55680006"
+4,"none","no_conditions_recorded","",""
