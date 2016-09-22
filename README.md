@@ -40,6 +40,19 @@ Tables
 
 Note: the "_dim" suffix means "dimension". These tables contain data that rarely changes.
 
+Deploying
+---------
+The synthetic statistics schema can be deployed to the Postgres database by running `deploy_stats_schema.sh`. This does the following:
+
+1. Drops all existing dimension tables
+2. Creates all dimension tables
+3. Populates all dimension tables with current data (from CSV files)
+4. Creates all fact tables (these will be empty)
+5. Creates all views
+6. Runs `VACUUM` on the new tables
+
+**Note:** This script assumes that the `fhir` database and role `synth_ma` already exist.
+
 Resetting Statistics
 --------------------
 Run the script `resetfacts.sh` as user `postgres`. This does the following:
