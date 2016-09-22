@@ -5,11 +5,11 @@
 CREATE TABLE synth_ma.synth_condition_dim
 (
   condition_id serial PRIMARY KEY,
-  fact_name character varying(100),
+  disease_id integer,
   condition_name character varying(100),
   code_system character varying(100),
   code character varying(20),
-  CONSTRAINT synth_condition_code_dim UNIQUE (code_system, code)
+  CONSTRAINT synth_condition_code_dim UNIQUE (condition_name, code_system, code)
 )
 WITH (
   OIDS=FALSE

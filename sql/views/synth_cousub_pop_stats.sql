@@ -1,6 +1,6 @@
-﻿DROP VIEW IF EXISTS synth_ma.synth_cousub_stats CASCADE;
+﻿DROP VIEW IF EXISTS synth_ma.synth_cousub_pop_stats CASCADE;
 
-CREATE VIEW synth_ma.synth_cousub_stats AS
+CREATE VIEW synth_ma.synth_cousub_pop_stats AS
 
 SELECT ct_dim.ct_fips
 	, ct_dim.ct_name
@@ -20,7 +20,7 @@ LEFT JOIN synth_ma.synth_cousub_dim AS cs_dim
 	ON ct_dim.ct_fips = cs_dim.ct_fips
 	AND cs_dim.cs_fips != '00000'
 	
-LEFT JOIN synth_ma.synth_facts AS f
+LEFT JOIN synth_ma.synth_pop_facts AS f
 	ON cs_dim.cs_fips = f.cs_fips
 	
 GROUP BY ct_dim.ct_fips
