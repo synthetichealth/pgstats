@@ -7,10 +7,10 @@ SELECT ct_dim.ct_fips
 	, ct_dim.sq_mi
 	, ct_dim.ct_poly
 	, ct_dim.ct_pnt
-	, CASE WHEN f.pop > 0 THEN f.pop ELSE 0 END AS pop
-	, CASE WHEN f.pop_male > 0 THEN f.pop_male ELSE 0 END AS pop_male
-	, CASE WHEN f.pop_female > 0 THEN f.pop_female ELSE 0 END AS pop_female
-	, CASE WHEN f.pop > 0 THEN f.pop / ct_dim.sq_mi ELSE 0 END AS pop_sm
+	, CASE WHEN SUM(f.pop) > 0 THEN SUM(f.pop) ELSE 0 END AS pop
+	, CASE WHEN SUM(f.pop_male) > 0 THEN SUM(f.pop_male) ELSE 0 END AS pop_male
+	, CASE WHEN SUM(f.pop_female) > 0 THEN SUM(f.pop_female) ELSE 0 END AS pop_female
+	, CASE WHEN SUM(f.pop) > 0 THEN SUM(f.pop) / ct_dim.sq_mi ELSE 0 END AS pop_sm
 	
 FROM synth_ma.synth_county_dim AS ct_dim
 
@@ -25,9 +25,6 @@ GROUP BY ct_dim.ct_fips
 	, ct_dim.sq_mi
 	, ct_dim.ct_poly
 	, ct_dim.ct_pnt
-	, f.pop
-	, f.pop_male
-	, f.pop_female
 ;
 ALTER TABLE synth_ma.synth_county_pop_stats
   OWNER TO synth_ma;
