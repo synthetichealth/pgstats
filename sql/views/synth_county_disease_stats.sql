@@ -3,7 +3,7 @@
 CREATE VIEW synth_ma.synth_county_disease_stats AS
 
 WITH cd AS (
-	SELECT cs_dim.ct_fips, ct_dim.ct_name, cs_dim.cs_fips, disease_dim.disease_name
+	SELECT cs_dim.ct_fips, ct_dim.ct_name, cs_dim.cs_fips, disease_dim.disease_name, disease_dim.disease_id
 	FROM synth_ma.synth_cousub_dim cs_dim
 	INNER JOIN synth_ma.synth_county_dim ct_dim
 		ON ct_dim.ct_fips = cs_dim.ct_fips
@@ -18,7 +18,7 @@ SELECT cd.ct_fips
 	, CASE WHEN MIN(ct_view.pop) = 0 THEN 0 WHEN SUM(f.pop) > 0 THEN SUM(f.pop) / MIN(ct_view.pop) ELSE 0 END AS rate
 FROM cd AS cd
 LEFT JOIN synth_ma.synth_disease_facts AS f
-	ON f.cs_fips = cd.cs_fips
+	ON f.cs_fips = cd.cs_fips AND f.disease_id = cd.disease_id
 LEFT JOIN synth_ma.synth_county_pop_stats AS ct_view
 	ON ct_view.ct_fips = cd.ct_fips
 GROUP BY cd.ct_fips, cd.ct_name, cd.disease_name

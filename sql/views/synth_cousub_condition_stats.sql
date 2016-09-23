@@ -3,7 +3,7 @@
 CREATE VIEW synth_ma.synth_cousub_condition_stats AS
 
 WITH cd AS (
-    SELECT cs_dim.cs_fips, cs_dim.cs_name, cond_dim.condition_name
+    SELECT cs_dim.cs_fips, cs_dim.cs_name, cond_dim.condition_name, cond_dim.condition_id
     FROM synth_ma.synth_cousub_dim cs_dim
     CROSS JOIN synth_ma.synth_condition_dim cond_dim
     WHERE cs_dim.cs_fips != '00000'
@@ -17,10 +17,10 @@ SELECT cd.cs_fips
     , CASE WHEN cs_view.pop = 0 THEN 0 WHEN f.pop > 0 THEN f.pop / cs_view.pop ELSE 0 END AS rate
 FROM cd AS cd
 LEFT JOIN synth_ma.synth_condition_facts AS f
-    ON f.cs_fips = cd.cs_fips
+    ON f.cs_fips = cd.cs_fips AND f.condition_id = cd.condition_id
 LEFT JOIN synth_ma.synth_cousub_pop_stats AS cs_view
     ON cs_view.cs_fips = cd.cs_fips
-GROUP BY cd.cs_fips, cd.cs_name, cd.condition_name, f.pop, f.pop_male, f.pop_female, cs_view.pop
+    
 ORDER BY cd.cs_fips;
 
 ALTER TABLE synth_ma.synth_cousub_condition_stats
