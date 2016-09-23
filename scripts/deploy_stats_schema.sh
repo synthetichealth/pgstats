@@ -10,12 +10,12 @@ echo "Removing old stats schema, if it exists..."
 
 psql -d fhir <<EOF
 -- Clear the views
-DROP VIEW synth_ma.synth_county_disease_stats CASCADE;
-DROP VIEW synth_ma.synth_cousub_disease_stats CASCADE;
-DROP VIEW synth_ma.synth_county_condition_stats CASCADE;
-DROP VIEW synth_ma.synth_cousub_condition_stats CASCADE;
-DROP VIEW synth_ma.synth_county_pop_stats CASCADE;
-DROP VIEW synth_ma.synth_cousub_pop_stats CASCADE;
+DROP VIEW IF EXISTS synth_ma.synth_county_disease_stats CASCADE;
+DROP VIEW IF EXISTS synth_ma.synth_cousub_disease_stats CASCADE;
+DROP VIEW IF EXISTS synth_ma.synth_county_condition_stats CASCADE;
+DROP VIEW IF EXISTS synth_ma.synth_cousub_condition_stats CASCADE;
+DROP VIEW IF EXISTS synth_ma.synth_county_pop_stats CASCADE;
+DROP VIEW IF EXISTS synth_ma.synth_cousub_pop_stats CASCADE;
 
 -- Clear the old fact tables
 DROP TABLE IF EXISTS synth_ma.synth_disease_facts;

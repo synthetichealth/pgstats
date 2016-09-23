@@ -2,31 +2,27 @@
 
 CREATE VIEW synth_ma.synth_cousub_disease_stats AS
 
-SELECT cs_dim.cs_fips
-	, disease_dim.disease_name
+WITH cd AS (
+	SELECT cs_dim.cs_fips, cs_dim.cs_name, disease_dim.disease_name
+	FROM synth_ma.synth_cousub_dim cs_dim
+	CROSS JOIN synth_ma.synth_disease_dim disease_dim
+	WHERE cs_dim.cs_fips != '00000'
+)
+SELECT cd.cs_fips
+	, cd.cs_name
+	, cd.disease_name
 	, CASE WHEN f.pop > 0 THEN f.pop ELSE 0 END AS pop
 	, CASE WHEN f.pop_male > 0 THEN f.pop_male ELSE 0 END AS pop_male
 	, CASE WHEN f.pop_female > 0 THEN f.pop_female ELSE 0 END AS pop_female
-	, CASE WHEN MIN(cousub_v.pop) = 0 THEN 0 WHEN f.pop > 0 THEN f.pop / MIN(cousub_v.pop) ELSE 0 END AS rate
-	
-FROM synth_ma.synth_cousub_dim AS cs_dim
-	
+	, CASE WHEN cs_view.pop = 0 THEN 0 WHEN f.pop > 0 THEN f.pop / cs_view.pop ELSE 0 END AS rate
+FROM cd AS cd
 LEFT JOIN synth_ma.synth_disease_facts AS f
-	ON cs_dim.cs_fips = f.cs_fips
+	ON f.cs_fips = cd.cs_fips
+LEFT JOIN synth_ma.synth_cousub_pop_stats AS cs_view
+	ON cs_view.cs_fips = cd.cs_fips
+GROUP BY cd.cs_fips, cd.cs_name, cd.disease_name, f.pop, f.pop_male, f.pop_female, cs_view.pop
+ORDER BY cd.cs_fips;
 
-INNER JOIN synth_ma.synth_disease_dim AS disease_dim
-	ON f.disease_id = disease_dim.disease_id
-
-LEFT JOIN synth_ma.synth_cousub_pop_stats AS cousub_v
-	ON cs_dim.cs_fips = cousub_v.cs_fips
-	
-GROUP BY cs_dim.cs_fips
-	, disease_dim.disease_name
-	, f.pop
-	, f.pop_male
-	, f.pop_female
-;
 ALTER TABLE synth_ma.synth_cousub_disease_stats
   OWNER TO synth_ma;
 GRANT ALL ON TABLE synth_ma.synth_cousub_disease_stats TO synth_ma;
-	
